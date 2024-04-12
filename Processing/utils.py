@@ -28,3 +28,10 @@ def GetTotalFiles(path):
         else:
             count += GetTotalFiles(f'{path}/{file}')
     return count
+
+def GetTotalFolders(path):
+    count = 0
+    for dir in os.listdir(path):
+        if os.path.isdir(f'{path}/{dir}'):
+            count += 1
+    return count
