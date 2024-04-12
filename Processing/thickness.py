@@ -12,3 +12,7 @@ def thicknessImg(img):
         img = cv.dilate(img, np.ones((size, size)))
 
     return img
+
+def resize(img, scale):
+    altura, largura = img.shape[:2]
+    return cv.resize(img, (largura * scale, altura * scale))

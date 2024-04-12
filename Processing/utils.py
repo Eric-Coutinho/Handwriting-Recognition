@@ -19,3 +19,12 @@ def Rects2Rect(rects):
         xf = max(xf, x2)
         yf = max(yf, y2)
     return ((xi, yi), (xf, yf))
+
+def GetTotalFiles(path):
+    count = 0
+    for file in os.listdir(path):
+        if os.path.isfile(f'{path}/{file}'):
+            count += 1
+        else:
+            count += GetTotalFiles(f'{path}/{file}')
+    return count
