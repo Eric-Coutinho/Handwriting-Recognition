@@ -1,6 +1,7 @@
-using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System;
+using Timer = System.Windows.Forms.Timer;
 
 namespace Winforms;
 
@@ -9,6 +10,7 @@ public partial class Form1 : Form
     PictureBox pb = new PictureBox();
     Bitmap bmp;
     Graphics g;
+    Timer tm;
     private bool isDrawing = false;
     private bool isErasing = false;
     private Point previousPoint;
@@ -18,14 +20,20 @@ public partial class Form1 : Form
     {
         InitializeComponent();
 
+        this.tm = new Timer();
+        this.tm.Interval = 20;
+
         this.BackColor = Color.White;
 
         this.WindowState = FormWindowState.Maximized;
         this.FormBorderStyle = FormBorderStyle.None;
 
-        this.MouseDown += panel1_MouseDown;
-        this.MouseMove += panel1_MouseMove;
-        this.MouseUp += panel1_MouseUp;
+        this.Controls.Add(pb);
+        pb.Dock = DockStyle.Fill;
+
+        pb.MouseDown += pb_MouseDown;
+        pb.MouseMove += pb_MouseMove;
+        pb.MouseUp += pb_MouseUp;
 
         this.KeyDown += (o, e) =>
         {
@@ -39,10 +47,11 @@ public partial class Form1 : Form
                 this.thickness += 5;
 
             if (e.KeyCode == Keys.Down)
-                this.thickness -= 5;
+                this.thickness -= 10;
 
-            if (e.KeyCode == Keys.E) {
-                if(isErasing == false)
+            if (e.KeyCode == Keys.E)
+            {
+                if (isErasing == false)
                     this.isErasing = true;
                 else
                     this.isErasing = false;
@@ -56,54 +65,90 @@ public partial class Form1 : Form
             g = Graphics.FromImage(bmp);
             g.Clear(Color.White);
             this.pb.Image = bmp;
-
-            Onstart();
         };
+
+        tm.Tick += (o, e) =>
+        {
+            Frame();
+            pb.Refresh();
+        };
+
+        tm.Start();
     }
 
-    void Onstart()
+    void Frame()
     {
-
+        string thicknessText = $"{thickness}";
+        Font font = new Font("Arial", 12);
+        Brush brush = Brushes.Black;
+        PointF point = new PointF(10, 10);
+        g.FillRectangle(Brushes.GhostWhite, point.X, point.Y, 30, 20);
+        g.DrawString(thicknessText, font, brush, point);
     }
 
     private void clearPanel()
     {
-        this.Invalidate();
+        this.thickness = 5;
+        g.Clear(Color.White);
+        pb.Invalidate();
     }
 
-    private void panel1_MouseDown(object sender, MouseEventArgs e)
+    private void pb_MouseDown(object sender, MouseEventArgs e)
     {
         isDrawing = true;
         previousPoint = e.Location;
     }
 
-    private void panel1_MouseUp(object sender, MouseEventArgs e)
+    private void pb_MouseUp(object sender, MouseEventArgs e)
     {
         isDrawing = false;
     }
-    private void panel1_MouseMove(object sender, MouseEventArgs e)
+    private void pb_MouseMove(object sender, MouseEventArgs e)
     {
         if (isDrawing && isErasing == false)
         {
-            using (Graphics g = this.CreateGraphics())
+            using (Graphics g = Graphics.FromImage(bmp))
             {
-                using (Pen pen = new Pen(Color.Black, thickness))
+                var deltaX = e.X - previousPoint.X;
+                var deltaY = e.Y - previousPoint.Y;
+                var dist = MathF.Sqrt(deltaX * deltaX + deltaY * deltaY);
+
+                for (float d = 0; d < 1; d += 1f / dist)
                 {
-                    g.DrawLine(pen, previousPoint, e.Location);
+                    var x = (1 - d) * previousPoint.X + d * e.X;
+                    var y = (1 - d) * previousPoint.Y + d * e.Y;
+                    g.FillEllipse(Brushes.Black,
+                        x - thickness / 2,
+                        y - thickness / 2,
+                        thickness, thickness
+                    );
                 }
+
                 previousPoint = e.Location;
+                pb.Refresh();
             }
         }
-
         else if (isDrawing && isErasing == true)
         {
-            using (Graphics g = this.CreateGraphics())
+            using (Graphics g = Graphics.FromImage(bmp))
             {
-                using (Pen pen = new Pen(Color.White, thickness + 5))
+                var deltaX = e.X - previousPoint.X;
+                var deltaY = e.Y - previousPoint.Y;
+                var dist = MathF.Sqrt(deltaX * deltaX + deltaY * deltaY);
+
+                for (float d = 0; d < 1; d += 1f / dist)
                 {
-                    g.DrawLine(pen, previousPoint, e.Location);
+                    var x = (1 - d) * previousPoint.X + d * e.X;
+                    var y = (1 - d) * previousPoint.Y + d * e.Y;
+                    g.FillEllipse(Brushes.White,
+                        x - thickness / 2,
+                        y - thickness / 2,
+                        thickness, thickness
+                    );
                 }
+
                 previousPoint = e.Location;
+                pb.Refresh();
             }
         }
     }
