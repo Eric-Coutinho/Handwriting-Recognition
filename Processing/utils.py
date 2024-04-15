@@ -1,5 +1,6 @@
 import os
 import cv2 as cv
+import numpy as np
 
 def SaveImage(path, file, img):
     if not os.path.exists(path):
@@ -35,3 +36,12 @@ def GetTotalFolders(path):
         if os.path.isdir(f'{path}/{dir}'):
             count += 1
     return count
+
+def isBinarized(img):
+    unique_pixels = np.unique(img)
+    if len(unique_pixels) == 2:
+        hist = cv.calcHist([img], [0], None, [256], [0, 256])
+        peaks = np.where(hist > 0)[0]
+        if len(peaks) == 2:
+            return True
+    return False
