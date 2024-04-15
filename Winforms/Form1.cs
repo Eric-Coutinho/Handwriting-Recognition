@@ -78,12 +78,27 @@ public partial class Form1 : Form
 
     void Frame()
     {
-        string thicknessText = $"{thickness}";
+        var mode = isErasing ? "Erasing" : "Drawing";
+        string thicknessText = $"thickness: {thickness}    mode: {mode}";
         Font font = new Font("Arial", 12);
         Brush brush = Brushes.Black;
         PointF point = new PointF(10, 10);
-        g.FillRectangle(Brushes.GhostWhite, point.X, point.Y, 30, 20);
+        g.FillRectangle(Brushes.GhostWhite, point.X, point.Y, 230, 20);
         g.DrawString(thicknessText, font, brush, point);
+
+        string commandsText = "E = Erase\nBackSpace = Clear";
+        Font commandsFont = new Font("Arial", 12);
+        Brush commandsBrush = Brushes.Black;
+        PointF commandsPoint = new PointF(10, 30);
+        g.FillRectangle(Brushes.GhostWhite, commandsPoint.X, commandsPoint.Y, 200, 40);
+        g.DrawString(commandsText, commandsFont, commandsBrush, commandsPoint);
+
+        string arrowsText = "Arrow Up = +5 thickness\nArrow Down = -10 thickness";
+        Font arrowsFont = new Font("Arial", 12);
+        Brush arrowsBrush = Brushes.Black;
+        PointF arrowsPoint = new PointF(160, 30);
+        g.FillRectangle(Brushes.GhostWhite, arrowsPoint.X, arrowsPoint.Y, 210, 40);
+        g.DrawString(arrowsText, arrowsFont, arrowsBrush, arrowsPoint);
     }
 
     private void clearPanel()
