@@ -44,10 +44,11 @@ public partial class Form1 : Form
                 clearPanel();
 
             if (e.KeyCode == Keys.Up)
-                this.thickness += 5;
+                this.thickness += 10;
 
             if (e.KeyCode == Keys.Down)
-                this.thickness -= 10;
+                if(this.thickness >= 15)
+                    this.thickness -= 10;
 
             if (e.KeyCode == Keys.E)
             {
