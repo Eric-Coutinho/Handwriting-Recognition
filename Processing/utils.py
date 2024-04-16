@@ -45,3 +45,21 @@ def isBinarized(img):
         if len(peaks) == 2:
             return True
     return False
+
+def resize(img, size):
+    heigth, width = img.shape[:2]
+    nwidth, nheigth = size
+    
+    new_img = np.ones((nheigth, nwidth, 3), dtype=np.uint8) * 255
+    
+    scale = min(nwidth/width, nheigth/heigth)
+    sheight = int(heigth * scale)
+    swidth = int(width * scale)
+    
+    y = (nheigth - sheight) // 2
+    x = (nwidth - swidth) // 2
+    
+    img = cv.resize(img, (swidth, sheight))
+    
+    new_img[y:y+sheight, x:x+swidth] = img
+    return new_img

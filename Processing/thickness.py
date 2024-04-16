@@ -9,7 +9,7 @@ def thicknessImg(img):
     rand = random.randint(-1, 3)
     size = random.randint(0, 30)
     
-    img = resize(img, 1.5)
+    img = scalarResize(img, 1.5)
     if (rand < 1):
         img = cv.erode(img, np.ones((size, size)))
     else:
@@ -20,7 +20,7 @@ def thicknessImg(img):
 
     return img
 
-def resize(img, scale):
+def scalarResize(img, scale):
     heigth, width = img.shape[:2]
     nheigth = int(heigth * scale)
     nwidth = int(width * scale)
