@@ -105,9 +105,18 @@ def getLines(rects, mean_height):
     
     return merged_lines
 
+def wordCorrector(word):
+    temp = []
+    for char in word:
+        rect = char
+        for c in word:
+            if char[1][1] < c [0][1] and ((char[0][0] > c[0][0] and char[0][0] < c[1][0]) or (char[1][0] > c[0][0] and char[1][0] < c[1][0])):
+                rect = Rects2Rect([rect, c])
+        temp.append(rect)
+    word.clear()
+    word.extend(temp)
+
 mark = img.copy()
-for rect in rects:
-    mark = cv.rectangle(mark, rect[0], rect[1], (0, 255, 0), 2)
     
 text = []
 for rect in rects:
@@ -120,14 +129,18 @@ for rect in rects:
         continue
     orderInsert(text, rect)
     
+mean_width = 0
 mean_height = 0
 for char in text:
+    mean_width += char[1][0] - char[0][0]
     mean_height += char[1][1] - char[0][1]
+mean_width /= len(text)
 mean_height /= len(text)
 
 # lines = getLines(text, mean_height)
 # for line in lines:
 #     cv.line(mark, line[0], line[1], (255, 0, 0), 5)
+    
 lines_pos = getLines(text, mean_height)
 lines = [[] for _ in range(len(lines_pos))]
 for char in text:
@@ -157,12 +170,56 @@ for line in lines:
     
 #     cv.line(mark, start, end, (50, 50, 255 - int(scale * char)), 2)
 
+distance = 0
+spaces = 0
 for line in lines:
-    for char in range(len(line) - 1):
-        start = rectCenter(line[char])
-        end = rectCenter(line[char + 1])
+    for i in range(len(line)):
+        if i < 1 <= 0:
+            continue
+    
+        spaces += 1
+        distance += max(0, line[i][0][0] - line[i - 1][1][0])
+mean_distance = distance / spaces
         
-        cv.line(mark, start, end, (50, 50, 255 - int(scale * char)), 2)
+for i in range(len(lines)):
+    line = []
+    for char in lines[i]:
+        if len(line) < 1 or max(0, char[0][0] - line[-1][-1][1][0]) > mean_distance * 1.5:
+            line.append([])
+        line[-1].append(char)
+    lines[i] = line
+   
+for i in range(len(lines)):
+    temp = []
+    for j in range(len(lines[i])):
+        word = Rects2Rect(lines[i][j])
+        
+        if j < 1 or max(0, word[0][0] - Rects2Rect(lines[i][j - 1])[1][0]) > mean_distance:
+            temp.append([])
+            
+        temp[-1].extend(lines[i][j])
+    lines[i] = temp
+    
+for line in lines:
+    for word in line:
+        rect = Rects2Rect(word)
+        cv.rectangle(mark, rect[0], rect[1], (0, 0, 255), 2)
+        
+for line in lines:
+    for word in line:
+        wordCorrector(word)
+        
+for line in lines:
+    for word in line:
+        for char in word:
+            mark = cv.rectangle(mark, char[0], char[1], (0, 255, 0), 2)
+
+# for line in lines:
+#     for char in range(len(line) - 1):
+#         start = rectCenter(line[char])
+#         end = rectCenter(line[char + 1])
+        
+#         cv.line(mark, start, end, (50, 50, 255 - int(scale * char)), 2)
     
 cv.imshow('image', mark)
 cv.waitKey(0)
