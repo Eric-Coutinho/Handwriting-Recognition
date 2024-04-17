@@ -1,9 +1,15 @@
 {
     "cSpell.words": [
+        "argmax",
+        "floodfill",
         "imshow",
+        "keras",
+        "numpy",
         "Oemminus",
         "Oemplus",
         "Onstart",
+        "rects",
+        "tensorflow",
         "Winforms"
     ]
 }
