@@ -125,16 +125,44 @@ for char in text:
     mean_height += char[1][1] - char[0][1]
 mean_height /= len(text)
 
-lines = getLines(text, mean_height)
+# lines = getLines(text, mean_height)
+# for line in lines:
+#     cv.line(mark, line[0], line[1], (255, 0, 0), 5)
+lines_pos = getLines(text, mean_height)
+lines = [[] for _ in range(len(lines_pos))]
+for char in text:
+    center = rectCenter(char)
+    index = 0
+    for i in range(len(lines_pos)):
+        if abs(lines_pos[i][1][1] - center[1]) < abs(lines_pos[index][1][1] - center[1]):
+            index = i
+    lines[index].append(char)
+    
 for line in lines:
-    cv.line(mark, line[0], line[1], (255, 0, 0), 5)
+    rect = None
+    for char in line:
+        if rect is None:
+            rect = char
+            continue
+        rect = (
+            (min(char[0][0], rect[0][0]), min(char[0][1], rect[0][1])),
+            (max(char[1][0], rect[1][0]), max(char[1][1], rect[1][1]))
+        )
+    cv.rectangle(mark, rect[0], rect[1], (255, 0, 0), 2)
     
-scale = 150 / len(text)
-for char in range(len(text) - 1):
-    start = rectCenter(text[char])
-    end = rectCenter(text[char + 1])
+# scale = 150 / len(text)
+# for char in range(len(text) - 1):
+#     start = rectCenter(text[char])
+#     end = rectCenter(text[char + 1])
     
-    cv.line(mark, start, end, (50, 50, 255 - int(scale * char)), 2)
+#     cv.line(mark, start, end, (50, 50, 255 - int(scale * char)), 2)
+
+for line in lines:
+    for char in range(len(line) - 1):
+        start = rectCenter(line[char])
+        end = rectCenter(line[char + 1])
+        
+        cv.line(mark, start, end, (50, 50, 255 - int(scale * char)), 2)
     
 cv.imshow('image', mark)
 cv.waitKey(0)
