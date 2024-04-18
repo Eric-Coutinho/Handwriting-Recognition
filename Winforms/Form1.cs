@@ -15,13 +15,14 @@ public partial class Form1 : Form
     Graphics g;
     Timer tm;
     string uploadedImagePath = "";
-    string answer = "oiiiii";
+    string answer = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBCCCCCCCCCCCCCCCC";
     string url = "http://example.com/upload"; // COLOCAR A URL AQUI
     private bool isDrawing = false;
     private bool isErasing = false;
     private Point previousPoint;
     private int thickness = 10;
     private bool isPrinting = false;
+    SpeechSynthesizer synthesizer = new SpeechSynthesizer();
 
     public Button createButton(string text, Point point, Size size)
     {
@@ -39,7 +40,7 @@ public partial class Form1 : Form
         this.tm = new Timer();
         this.tm.Interval = 20;
 
-        Button uploadButton = createButton("Fazer upload", new Point(10, 75), new Size(100, 30));
+        Button uploadButton = createButton("Thickness 10", new Point(10, 75), new Size(100, 30));
         uploadButton.Click += selectImage;
         this.Controls.Add(uploadButton);
 
@@ -225,32 +226,11 @@ public partial class Form1 : Form
 
         // answer = response;
 
-        SpeechSynthesizer synthesizer = new SpeechSynthesizer();
-
         synthesizer.Speak(answer);
-
-        synthesizer.Dispose();
     }
 
     private void selectImage(object sender, EventArgs e)
     {
-        OpenFileDialog openFileDialog = new OpenFileDialog
-        {
-            Filter = "Arquivos de imagem|*.jpg;*.jpeg;*.png;*.gif;*.bmp|Todos os arquivos|*.*"
-        };
-
-        DialogResult result = openFileDialog.ShowDialog();
-
-        if (result == DialogResult.OK)
-        {
-            try
-            {
-                uploadedImagePath = openFileDialog.FileName;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Ocorreu um erro ao carregar a imagem: " + ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
+        this.thickness = 10;
     }
 }
