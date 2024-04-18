@@ -3,6 +3,7 @@ using System.Net;
 using System.Drawing;
 using System.Diagnostics;
 using System.Windows.Forms;
+using System.Speech.Synthesis;
 using Timer = System.Windows.Forms.Timer;
 
 namespace Winforms;
@@ -14,7 +15,7 @@ public partial class Form1 : Form
     Graphics g;
     Timer tm;
     string uploadedImagePath = "";
-    string answer = "";
+    string answer = "oiiiii";
     string url = "http://example.com/upload"; // COLOCAR A URL AQUI
     private bool isDrawing = false;
     private bool isErasing = false;
@@ -205,26 +206,30 @@ public partial class Form1 : Form
 
         isPrinting = false;
 
-        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-        request.Method = "POST";
-        request.ContentType = "image/jpeg";
+        // HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+        // request.Method = "POST";
+        // request.ContentType = "image/jpeg";
 
-        using (FileStream fileStream = File.OpenRead(filePath))
-        {
-            byte[] buffer = new byte[fileStream.Length];
-            fileStream.Read(buffer, 0, (int)fileStream.Length);
+        // using (FileStream fileStream = File.OpenRead(filePath))
+        // {
+        //     byte[] buffer = new byte[fileStream.Length];
+        //     fileStream.Read(buffer, 0, (int)fileStream.Length);
 
-            using (Stream requestStream = request.GetRequestStream())
-            {
-                requestStream.Write(buffer, 0, buffer.Length);
-            }
-        }
+        //     using (Stream requestStream = request.GetRequestStream())
+        //     {
+        //         requestStream.Write(buffer, 0, buffer.Length);
+        //     }
+        // }
 
-        HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+        // HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
-        answer = response.stringContent;
+        // answer = response;
 
-        MessageBox.Show("Texto digitado: " + answer);
+        SpeechSynthesizer synthesizer = new SpeechSynthesizer();
+
+        synthesizer.Speak(answer);
+
+        synthesizer.Dispose();
     }
 
     private void selectImage(object sender, EventArgs e)

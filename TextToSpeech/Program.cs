@@ -2,6 +2,6 @@ using System.Speech.Synthesis;
 
 SpeechSynthesizer synthesizer = new SpeechSynthesizer();
 
-synthesizer.Speak("C# KkKkkKKkkkkkkkkk");
+synthesizer.Speak("OI LANDER UWU ONICHAN");
 
 synthesizer.Dispose();

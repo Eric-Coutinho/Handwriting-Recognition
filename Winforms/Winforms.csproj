@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="pythonnet" Version="3.0.3" />
+    <PackageReference Include="System.Speech" Version="8.0.0" />
   </ItemGroup>
 
 </Project>
