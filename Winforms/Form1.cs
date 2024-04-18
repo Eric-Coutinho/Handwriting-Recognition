@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Drawing;
 using System.Diagnostics;
 using System.Windows.Forms;
@@ -13,10 +14,12 @@ public partial class Form1 : Form
     Graphics g;
     Timer tm;
     string uploadedImagePath = "";
+    string answer = "";
+    string url = "http://example.com/upload"; // COLOCAR A URL AQUI
     private bool isDrawing = false;
     private bool isErasing = false;
     private Point previousPoint;
-    private int thickness = 5;
+    private int thickness = 10;
     private bool isPrinting = false;
 
     public Button createButton(string text, Point point, Size size)
@@ -132,7 +135,6 @@ public partial class Form1 : Form
 
     private void clearPanel()
     {
-        this.thickness = 5;
         g.Clear(Color.White);
         pb.Invalidate();
     }
@@ -191,12 +193,38 @@ public partial class Form1 : Form
             g.FillRectangle(Brushes.White, 0, 0, 320, 70);
         }
 
-        string filePath = "screenshot.png";
+        string filePath = "../Processing/screenshot.png";
+        if (!Directory.Exists("Processing"))
+        {
+            Directory.CreateDirectory("Processing");
+        }
+
         screenshotBitmap.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
 
         MessageBox.Show("Captura de tela salva com sucesso em: " + filePath);
 
         isPrinting = false;
+
+        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+        request.Method = "POST";
+        request.ContentType = "image/jpeg";
+
+        using (FileStream fileStream = File.OpenRead(filePath))
+        {
+            byte[] buffer = new byte[fileStream.Length];
+            fileStream.Read(buffer, 0, (int)fileStream.Length);
+
+            using (Stream requestStream = request.GetRequestStream())
+            {
+                requestStream.Write(buffer, 0, buffer.Length);
+            }
+        }
+
+        HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+        answer = response.stringContent;
+
+        MessageBox.Show("Texto digitado: " + answer);
     }
 
     private void selectImage(object sender, EventArgs e)
@@ -220,5 +248,4 @@ public partial class Form1 : Form
             }
         }
     }
-
 }
