@@ -13,9 +13,9 @@ def ascii_to_char(ascii_value):
         return "Input must be an integer representing ASCII value"
 
 # model = tf.keras.models.load_model("Processing/989-995.keras")
-model = tf.keras.models.load_model("Processing/98-99.keras")
+model = tf.keras.models.load_model("./98-99.keras")
 
-image = cv.imread("Processing/screenshot.png")
+image = cv.imread("./screenshot.png")
 
 rects = segmentation.getRects(image)
 
@@ -34,6 +34,7 @@ print(result.shape)
 maxIndex = np.argmax(result)
 
 folders = os.listdir("./Img")
+print(folders)
 print(result)
 print("Maior Index:", folders[maxIndex])
 

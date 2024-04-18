@@ -3,7 +3,7 @@ import cv2 as cv
 from segmentation import *
 from utils import *
 
-img = cv.imread('./test1.jpg')
+img = cv.imread('./test2.jpg')
 
 max_width = 1280
 max_height = 720
@@ -18,6 +18,12 @@ binarized = cv.erode(binarized, np.ones((5, 5)))
 binarized = cv.dilate(binarized, np.ones((7, 7)))
 
 rects = getRects(binarized, floodfill8D)
+print(len(rects))
+
+# background = getBackColors(img, rects)
+# binarizeByColors(img, background)
+# cv.imshow("", img)
+# cv.waitKey(0)
 
 def rectCenter(rect):
     x1, y1 = rect[0]
@@ -112,6 +118,7 @@ def wordCorrector(word):
         for c in word:
             if char[1][1] < c [0][1] and ((char[0][0] > c[0][0] and char[0][0] < c[1][0]) or (char[1][0] > c[0][0] and char[1][0] < c[1][0])):
                 rect = Rects2Rect([rect, c])
+                word.remove(c)
         temp.append(rect)
     word.clear()
     word.extend(temp)
@@ -180,25 +187,47 @@ for line in lines:
         spaces += 1
         distance += max(0, line[i][0][0] - line[i - 1][1][0])
 mean_distance = distance / spaces
+
+def separeWords(line, mean_distance):
+    new_line = []
+    for char in line:
+        if len(new_line) > 0:
+            print(new_line[-1])
+        if len(new_line) < 1 or max(0, char[0][0] - new_line[-1][-1][1][0]) > mean_distance * 1.5:
+            new_line.append([])
+        new_line[-1].append(char)
+    line = new_line
+    
+    new_line = []
+    for j in range(len(line)):
+        word = Rects2Rect(line[j])
         
-for i in range(len(lines)):
-    line = []
-    for char in lines[i]:
-        if len(line) < 1 or max(0, char[0][0] - line[-1][-1][1][0]) > mean_distance * 1.5:
-            line.append([])
-        line[-1].append(char)
-    lines[i] = line
-   
-for i in range(len(lines)):
-    temp = []
-    for j in range(len(lines[i])):
-        word = Rects2Rect(lines[i][j])
-        
-        if j < 1 or max(0, word[0][0] - Rects2Rect(lines[i][j - 1])[1][0]) > mean_distance:
-            temp.append([])
+        if j < 1 or max(0, word[0][0] - Rects2Rect(line[j - 1])[1][0]) > mean_distance:
+            new_line.append([])
             
-        temp[-1].extend(lines[i][j])
-    lines[i] = temp
+        new_line[-1].extend(line[j])
+        
+    return new_line
+        
+lines = [separeWords(lines[i], mean_distance) for i in range(len(lines))]
+# for i in range(len(lines)):
+#     line = []
+#     for char in lines[i]:
+#         if len(line) < 1 or max(0, char[0][0] - line[-1][-1][1][0]) > mean_distance * 1.5:
+#             line.append([])
+#         line[-1].append(char)
+#     lines[i] = line
+   
+# for i in range(len(lines)):
+#     temp = []
+#     for j in range(len(lines[i])):
+#         word = Rects2Rect(lines[i][j])
+        
+#         if j < 1 or max(0, word[0][0] - Rects2Rect(lines[i][j - 1])[1][0]) > mean_distance:
+#             temp.append([])
+            
+#         temp[-1].extend(lines[i][j])
+#     lines[i] = temp
     
 for line in lines:
     for word in line:
@@ -220,7 +249,12 @@ for line in lines:
 #         end = rectCenter(line[char + 1])
         
 #         cv.line(mark, start, end, (50, 50, 255 - int(scale * char)), 2)
-    
+count = 0
+for line in lines:
+    for word in line:
+        for char in word:
+            count += 1
+print(count)
 cv.imshow('image', mark)
 cv.waitKey(0)
 
